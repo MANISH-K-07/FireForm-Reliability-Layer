@@ -1,0 +1,4 @@
+pydantic
+jsonschema
+openai
+python-dotenv
