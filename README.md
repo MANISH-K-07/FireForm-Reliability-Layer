@@ -26,20 +26,9 @@ This reliability layer prioritizes:
 
 ---
 
-## 🧠 Architecture Overview
+## 🔧 Reliability Middleware Architecture
 
-Raw Incident Text
-↓
-LLM Extraction (Mock Extractor)
-↓
-Reliability Middleware
-• Missing Field Detection
-• Schema-Aware Normalization
-• Cross-Field Consistency Checks
-• Validation Enforcement
-• Confidence Adjustment
-↓
-Structured, Validated Incident Record
+![Reliability Layer Architecture](docs/assets/reliability-layer-flow.png)
 
 ---
 
@@ -139,17 +128,34 @@ Dataset is seeded for deterministic evaluation.
 ## 📂 Repository Structure
 
 ```
-fireform/
-├── extraction/
-│   └── mock_extractor.py
-├── reliability/
-│   ├── missing.py
-│   ├── validator.py
-│   ├── consistency.py
-│   ├── recoverability.py
+## 📂 Repository Structure
+
+```
+FireForm-Reliability-Layer/
+│
+├── fireform/
+│   ├── extraction/
+│   │   ├── extractor.py
+│   │   └── mock_extractor.py
+│   │
+│   ├── schema/
+│   │   └── incident_schema.py
+│   │
+│   └── reliability/
+│       ├── missing.py
+│       ├── validator.py
+│       ├── consistency.py
+│       ├── correction.py
+│       ├── confidence.py
+│       └── recoverability.py
+│
 ├── main.py
-benchmark_reliability.py
-generate_inputs.py
+├── benchmark_reliability.py
+├── generate_inputs.py
+├── test_pipeline.py
+└── README.md
+```
+
 ```
 
 ---
