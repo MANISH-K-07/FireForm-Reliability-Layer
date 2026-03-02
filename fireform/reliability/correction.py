@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-# 🟣 Normalize incident_time strings into ISO datetime
+# Normalize incident_time strings into ISO datetime
 def normalize_incident_time(value):
     now = datetime.now()
     if not isinstance(value, str):
@@ -20,7 +20,7 @@ def normalize_incident_time(value):
     return now.replace(microsecond=0).isoformat()
 
 
-# 🔵 Map raw severity strings to standard levels
+# Map raw severity strings to standard levels
 def correct_severity(value):
     mapping = {
         "very dangerous": "High",
@@ -32,18 +32,18 @@ def correct_severity(value):
     return value
 
 
-# 🟢 Run full correction pipeline
+# Run full correction pipeline
 def run_corrections(data):
 
-    # 1️⃣ Incident time
+    # Incident time
     if "incident_time" in data:
         data["incident_time"] = normalize_incident_time(data["incident_time"])
 
-    # 2️⃣ Report time auto-add
+    # Report time auto-add
     if "report_time" not in data:
         data["report_time"] = datetime.now().replace(microsecond=0).isoformat()
 
-    # 3️⃣ Location fix
+    # Location fix
     if isinstance(data.get("location"), dict):
         if not data["location"].get("city"):
             data["location"]["city"] = "Unknown"
@@ -53,7 +53,7 @@ def run_corrections(data):
         # naive string → dict conversion if LLM returned string
         data["location"] = {"city": "Unknown", "state": "Unknown"}
 
-    # 4️⃣ Severity fix
+    # Severity fix
     if "severity" in data:
         data["severity"] = correct_severity(data["severity"])
 

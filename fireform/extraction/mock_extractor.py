@@ -45,33 +45,33 @@ def extract_incident_data(user_input):
         "description": user_input
     }
 
-    # ---------- 🔴 CHAOS INJECTION ----------
+    # ---------- CHAOS INJECTION ----------
 
-    # 30% → remove location completely
+    # 30% - remove location completely
     if random.random() < 0.3:
         data.pop("location")
 
-    # 20% → location becomes string
+    # 20% - location becomes string
     elif random.random() < 0.2:
         data["location"] = "Near downtown mall"
 
-    # 15% → severity becomes free text
+    # 15% - severity becomes free text
     if random.random() < 0.15:
         data["severity"] = "extremely bad"
 
-    # 20% → remove severity
+    # 20% - remove severity
     if random.random() < 0.2:
         data.pop("severity")
 
-    # 25% → invalid datetime
+    # 25% - invalid datetime
     if random.random() < 0.25:
         data["incident_time"] = "32nd of Feb"
 
-    # 30% → remove time
+    # 30% - remove time
     if random.random() < 0.3:
         data.pop("incident_time")
 
-    # 40% → report_time missing (LLM often skips)
+    # 40% - report_time missing (LLM probable behaviour)
     if random.random() < 0.4:
         pass
     else:
