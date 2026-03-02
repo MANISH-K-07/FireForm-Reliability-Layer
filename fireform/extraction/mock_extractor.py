@@ -1,8 +1,13 @@
 from datetime import datetime
 import random
+import hashlib
 
 
 def extract_incident_data(user_input):
+
+    # Deterministic seed based on input
+    seed = int(hashlib.md5(user_input.encode()).hexdigest(), 16) % (10**8)
+    random.seed(seed)
 
     text = user_input.lower()
 

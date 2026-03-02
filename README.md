@@ -16,12 +16,22 @@ Emergency reporting systems cannot tolerate:
 * Contradictory severity classifications
 * Fabricated location data
 * Overconfident corrections
+* Structurally unstable extraction outputs
+
+Real-world LLM extractors frequently produce:
+
+* Missing keys
+* Free-text severity labels
+* Invalid datetime formats
+* Schema-incompatible nested structures
+* Non-deterministic outputs for identical reports
 
 This reliability layer prioritizes:
 
 * Structural validity
 * Logical consistency
 * Deterministic correction
+* Schema stability
 * Safety over aggressive auto-completion
 
 ---
@@ -34,23 +44,47 @@ This reliability layer prioritizes:
 
 ## ⚙️ Middleware Pipeline
 
-### 1. Missing Field Detection
+### 1. Extraction (LLM Output)
+
+Raw structured output from extraction system may include:
+
+* Missing fields
+* Invalid timestamps
+* Location as string
+* Free-text severity
+* Schema violations
+
+### 2. Structural Normalization Layer (NEW)
+
+Enforces deterministic schema shape before validation by:
+
+* Injecting missing schema keys
+* Converting string locations → structured format
+* Standardizing datetime placeholders
+* Preventing validator crashes from absent keys
+* Preserving semantic recoverability without hallucination
+
+This step ensures that:
+
+> Identical incident descriptions produce structurally stable normalized outputs despite stochastic extraction failures.
+
+### 3. Missing Field Detection
 
 Identifies incomplete extraction outputs.
 
-### 2. Schema-Aware Correction
+### 4. Schema-Aware Correction
 
-Normalizes:
+Recovers:
 
 * Natural language timestamps ("last night", "yesterday evening")
 * Severity inconsistencies
 * Recoverable metadata
 
-### 3. Validation Enforcement
+### 5. Validation Enforcement
 
 Ensures strict compliance with incident schema.
 
-### 4. Cross-Field Consistency Engine
+### 6. Cross-Field Consistency Engine
 
 Detects logical contradictions such as:
 
@@ -58,7 +92,7 @@ Detects logical contradictions such as:
 * Severe fire reports marked "minor"
 * High severity events with “no damage” descriptions
 
-### 5. Confidence Calibration
+### 7. Confidence Calibration
 
 Penalizes inconsistent outputs to avoid unsafe overconfidence.
 
@@ -79,34 +113,29 @@ Total Test Cases                  : 150
 
 --------------- RAW EXTRACTION ---------------
 Missing Field Cases               : 150
-Validation Error Cases            : 142
+Validation Error Cases            : 144
 
 ----------- WITH RELIABILITY LAYER -----------
-Structured Success Cases          : 67
-Validation Error Cases            : 83
-Consistency Warnings Raised       : 4
+Structured Success Cases          : 92
+Validation Error Cases            : 58
+Consistency Warnings Raised       : 7
 
 ------------------ METRICS -------------------
 Raw Missing Rate                  : 100.00%
-Raw Validation Error Rate         : 94.67%
-Post-Layer Success Rate           : 44.67%
+Raw Validation Error Rate         : 96.00%
+Post-Layer Success Rate           : 61.33%
 
 ----------- RECOVERABILITY METRICS -----------
-Salvageable Raw Cases             : 78
-Unrecoverable Raw Cases           : 72
-Post-Layer Recovered Cases        : 50
+Salvageable Raw Cases             : 65
+Unrecoverable Raw Cases           : 85
+Post-Layer Recovered Cases        : 59
 
-Effective Repair Rate             : 64.10%
+Effective Repair Rate             : 90.77%
 Unsafe Guess Count                : 0
 ----------------------------------------------
 ```
 
-**Key Result:**
-The middleware safely repairs 64.10% of structurally salvageable LLM outputs without introducing fabricated incident attributes.
-
----
-
-## 🔁 Reproduce Benchmark
+### 🔁 Reproduce Benchmark
 
 ```bash
 python benchmark_reliability.py
@@ -122,12 +151,10 @@ Dataset is seeded for deterministic evaluation.
 * Reject irrecoverable outputs instead of guessing
 * Reduce validation errors without increasing risk
 * Preserve traceability between raw text and structured output
+* Enforce structural determinism before semantic correction
 
 ---
 
-## 📂 Repository Structure
-
-```
 ## 📂 Repository Structure
 
 ```
@@ -135,13 +162,13 @@ FireForm-Reliability-Layer/
 │
 ├── fireform/
 │   ├── extraction/
-│   │   ├── extractor.py
 │   │   └── mock_extractor.py
 │   │
 │   ├── schema/
 │   │   └── incident_schema.py
 │   │
 │   └── reliability/
+│       ├── normalizer.py
 │       ├── missing.py
 │       ├── validator.py
 │       ├── consistency.py
@@ -154,8 +181,6 @@ FireForm-Reliability-Layer/
 ├── generate_inputs.py
 ├── test_pipeline.py
 └── README.md
-```
-
 ```
 
 ---

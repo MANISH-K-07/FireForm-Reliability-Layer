@@ -4,12 +4,15 @@ from fireform.reliability.validator import validate_incident
 from fireform.reliability.correction import run_corrections
 from fireform.reliability.confidence import compute_confidence
 from fireform.reliability.consistency import check_consistency
+from fireform.schema.normalizer import normalize_extracted_json
 
 
 def reliability_layer(user_input):
 
-    # Step 1 — Extract structured data (simulate LLM)
+    # Step 1 — Extract structured data (simulate LLM) & Normalize
     extracted = extract_incident_data(user_input)
+
+    extracted = normalize_extracted_json(extracted)
 
     # Step 2 — Detect missing fields
     missing = detect_missing_fields(extracted)
