@@ -1,14 +1,15 @@
 from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
 class Location(BaseModel):
-    city: str
-    state: str
+    city: Optional[str]
+    state: Optional[str]
 
 class IncidentReport(BaseModel):
     incident_type: str
     incident_time: datetime
+    report_time: datetime
     severity: str
     location: Location
-    description: Optional[str] = None
+    description: Optional[str]

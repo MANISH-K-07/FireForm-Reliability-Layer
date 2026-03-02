@@ -1,51 +1,33 @@
-from fireform.validation.correction_pipeline import run_corrections
-from fireform.validation.schema_validator import validate_incident
-from fireform.validation.missing_field_handler import detect_missing_fields
-from fireform.validation.confidence_scoring import compute_confidence
-
-
-# Temporary extractor (simulated LLM output)
-def extract_incident_data(user_input):
-    return {
-        "incident_type": user_input,
-        "severity": "Very Dangerous",
-        "incident_time": "Yesterday evening",
-        "location": "Near downtown mall"
-    }
+from fireform.extraction.mock_extractor import extract_incident_data
+from fireform.reliability.missing import detect_missing_fields
+from fireform.reliability.validator import validate_incident
+from fireform.reliability.correction import run_corrections
+from fireform.reliability.confidence import compute_confidence
 
 
 def reliability_layer(user_input):
 
     # Step 1 — Extract structured data
-    extracted_data = extract_incident_data(user_input)
+    extracted = extract_incident_data(user_input)
 
     # Step 2 — Detect missing fields
-    missing = detect_missing_fields(extracted_data)
+    missing = detect_missing_fields(extracted)
 
-    # Step 3 — Confidence score
-    confidence = compute_confidence(extracted_data)
-    threshold = 0.8
+    # Step 3 — Confidence scoring
+    confidence = compute_confidence(extracted)
 
-    # Step 4 — Validate
-    validated, errors = validate_incident(extracted_data)
+    # Step 4 — Try correction IF missing fields detected
+    if missing:
+        corrected = run_corrections(extracted)
+    else:
+        corrected = extracted
 
-    # Step 5 — Correction if needed
-    if errors:
-        corrected_data = run_corrections(extracted_data)
-        validated, errors = validate_incident(corrected_data)
-
-        return {
-            "confidence": confidence,
-            "missing_fields": missing,
-            "validation_error": errors,
-            "extracted": extracted_data,
-            "validated": validated
-        }
+    # Step 5 — Validate corrected data
+    validated, errors = validate_incident(corrected)
 
     return {
         "confidence": confidence,
         "missing_fields": missing,
-        "validation_error": None,
-        "extracted": extracted_data,
-        "validated": validated
+        "validated_output": validated,
+        "validation_errors": errors
     }
