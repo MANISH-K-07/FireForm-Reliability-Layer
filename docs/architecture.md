@@ -1,56 +1,89 @@
-# Architecture
+# Architecture Overview
 
-The reliability middleware sits between an upstream extraction module and the FireForm incident schema validator.
+## System Positioning
 
----
+The Reliability Middleware sits between:
 
-## Pipeline Stages
+LLM Extraction → Reliability Layer → Schema Validator → Operational Systems
 
-### 1. Extraction Layer
-
-Simulated LLM output using a mock extractor producing:
-
-* Incomplete metadata
-* Natural language timestamps
-* Non-standard severity levels
-* Missing location fields
+Its purpose is to stabilize and validate structured outputs before downstream use.
 
 ---
 
-### 2. Missing Field Detection
+## Middleware Pipeline
 
-Identifies schema-required attributes that are absent or null.
+### 1. Extraction (LLM Output)
 
----
+Produces partially structured JSON with possible:
 
-### 3. Schema-Aware Correction
-
-Performs deterministic normalization:
-
-* Timestamp resolution
-* Severity mapping
-* Location recovery
-
-without fabricating unavailable operational data.
+* Missing keys
+* Invalid types
+* Free-text substitutions
+* Nested schema corruption
 
 ---
 
-### 4. Validation Layer
+### 2. Structural Normalization Layer
 
-Ensures corrected outputs comply with the FireForm incident schema.
+Enforces deterministic schema structure before validation.
+
+Responsibilities:
+
+* Inject missing schema keys
+* Standardize location structure
+* Preserve recoverability without hallucinating data
+* Prevent validator crashes
+
+This layer ensures identical incident descriptions produce structurally stable intermediate representations.
 
 ---
 
-### 5. Consistency Engine
+### 3. Missing Field Detection
+
+Identifies incomplete fields that impact operational readiness.
+
+---
+
+### 4. Correction Engine
+
+Performs limited semantic recovery when safe:
+
+* Severity normalization
+* Recoverable metadata alignment
+
+---
+
+### 5. Schema Validation
+
+Strict Pydantic enforcement against the incident schema.
+
+---
+
+### 6. Cross-Field Consistency Engine
 
 Detects logical contradictions such as:
 
-* Explosion with Low severity
-* Severe event descriptions with Medium severity
-* High severity incidents reporting no impact
+* High severity but “no damage”
+* Explosion labeled “Low”
+* Severe description but Minor classification
 
 ---
 
-### 6. Confidence Adjustment
+### 7. Confidence Calibration
 
-Penalizes outputs exhibiting consistency violations to prevent unsafe operational overconfidence.
+Outputs a confidence score reflecting:
+
+* Structural completeness
+* Logical coherence
+* Repair interventions performed
+
+---
+
+## Design Philosophy
+
+The middleware enforces:
+
+* Deterministic structure
+* Conservative correction
+* Explicit rejection of unsafe outputs
+* Full traceability from input to validated report
