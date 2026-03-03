@@ -19,9 +19,9 @@ Dataset is seeded for reproducibility.
 | Metric                  | Raw Extraction | With Reliability Layer |
 | ----------------------- | -------------- | ---------------------- |
 | Missing Field Rate      | 100%           | —                      |
-| Validation Error Rate   | 96.00%         | 38.67%                 |
-| Structured Success Rate | —              | 61.33%                 |
-| Consistency Warnings    | —              | 7                      |
+| Validation Error Rate   | 97.33%         | 58.67%                 |
+| Structured Success Rate | —              | 41.33%                 |
+| Consistency Warnings    | —              | 4                      |
 
 ---
 
@@ -31,8 +31,8 @@ Dataset is seeded for reproducibility.
 | -------------------------- | ------ |
 | Salvageable Raw Cases      | 65     |
 | Unrecoverable Raw Cases    | 85     |
-| Post-Layer Recovered Cases | 59     |
-| Effective Repair Rate      | 90.77% |
+| Post-Layer Recovered Cases | 56     |
+| Effective Repair Rate      | 86.15% |
 | Unsafe Guess Count         | 0      |
 
 ---
@@ -41,6 +41,6 @@ Dataset is seeded for reproducibility.
 
 The Reliability Middleware safely repairs:
 
-> 90.77% of structurally salvageable LLM outputs without introducing fabricated incident attributes.
+> 86.15% of structurally salvageable LLM outputs without introducing fabricated incident attributes.
 
 This demonstrates that structural normalization significantly improves semantic recoverability while preserving operational safety.

@@ -1,7 +1,7 @@
 from main import reliability_layer
 
 # LLM Feed
-user_input = "asdf qwer zzzz nothing makes sense 12345 ???"
+user_input = "Severe fire but no visible damage today"
 
 # Readable Output (Temporary)
 def pretty_print(text, result):
