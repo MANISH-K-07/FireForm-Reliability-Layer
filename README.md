@@ -42,13 +42,7 @@ This reliability layer prioritizes:
 
 ---
 
-## 🔧 Reliability Middleware Architecture
-
-![Reliability Layer Architecture](docs/assets/reliability-layer-flow.png)
-
----
-
-## ⚙️ Middleware Pipeline
+## ⚙️ Reliability Middleware Pipeline
 
 ### 1. Extraction (LLM Output)
 
