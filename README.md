@@ -98,6 +98,56 @@ Penalizes inconsistent outputs to avoid unsafe overconfidence.
 
 ---
 
+## 🧪 Example Middleware Run
+
+The following example demonstrates how the Reliability Layer converts a noisy incident description into a schema-compliant structured report without fabricating operational metadata.
+
+### Input
+
+```
+Severe fire but no visible damage today
+```
+
+### Middleware Output
+
+```
+PS C:\Users\manis\OneDrive\Desktop\FireForm-Reliability-Layer> python test_pipeline.py
+
+================ INCIDENT REPORT =================
+Original Input    : Severe fire but no visible damage today
+
+Incident Type     : Fire
+Severity          : High
+Incident Time     : 2026-03-02 22:40:36
+Report Time       : 2026-03-02 22:40:36.640497
+Location          : None, None
+
+Missing Fields    : ['city', 'state']
+
+Consistency Errors:
+  None
+
+Consistency Warnings:
+  None
+
+Final Confidence  : 0.9
+==================================================
+```
+
+### Observations
+
+* Severity safely normalized from free-text description
+* Missing location preserved as explicitly unknown
+* No fabricated city/state values introduced
+* Timestamp retained from extraction output
+* Structured report passes strict schema validation
+
+This illustrates the middleware's core design principle:
+
+> Recover when safe. Reject when unsafe. Never hallucinate.
+
+---
+
 ## 📊 Benchmark (Reproducible)
 
 Evaluation conducted on a fixed synthetic dataset (n=150) simulating noisy emergency incident descriptions.
@@ -113,24 +163,24 @@ Total Test Cases                  : 150
 
 --------------- RAW EXTRACTION ---------------
 Missing Field Cases               : 150
-Validation Error Cases            : 144
+Validation Error Cases            : 146
 
 ----------- WITH RELIABILITY LAYER -----------
-Structured Success Cases          : 92
-Validation Error Cases            : 58
-Consistency Warnings Raised       : 7
+Structured Success Cases          : 62
+Validation Error Cases            : 88
+Consistency Warnings Raised       : 4
 
 ------------------ METRICS -------------------
 Raw Missing Rate                  : 100.00%
-Raw Validation Error Rate         : 96.00%
-Post-Layer Success Rate           : 61.33%
+Raw Validation Error Rate         : 97.33%
+Post-Layer Success Rate           : 41.33%
 
 ----------- RECOVERABILITY METRICS -----------
 Salvageable Raw Cases             : 65
 Unrecoverable Raw Cases           : 85
-Post-Layer Recovered Cases        : 59
+Post-Layer Recovered Cases        : 56
 
-Effective Repair Rate             : 90.77%
+Effective Repair Rate             : 86.15%
 Unsafe Guess Count                : 0
 ----------------------------------------------
 ```
@@ -142,6 +192,93 @@ python benchmark_reliability.py
 ```
 
 Dataset is seeded for deterministic evaluation.
+
+---
+
+## 🔎 Middleware in Action (Consistency Intervention Example)
+
+The following example demonstrates how the Reliability Layer detects semantic contradictions in incident descriptions and penalizes confidence to avoid unsafe over-trust in structured outputs.
+
+### Input
+
+```
+Massive explosion reported but everything seems safe with no injuries or damage
+```
+
+### Output
+
+```
+================ INCIDENT REPORT =================
+Original Input    : Massive explosion reported but everything seems safe with no injuries or damage
+
+Incident Type     : Explosion
+Severity          : High
+Incident Time     : 2026-03-02 22:46:52
+Report Time       : 2026-03-02 22:46:52.065873
+Location          : None, None
+
+Missing Fields    : ['city', 'state']
+
+Consistency Errors:
+  None
+
+Consistency Warnings:
+  - High severity conflicts with low-impact description
+
+Final Confidence  : 0.8
+==================================================
+```
+
+### Interpretation
+
+Although the extractor assigns a **High severity** classification based on the phrase *"Massive explosion"*,
+the Reliability Layer identifies a contradiction with the description:
+
+> *"everything seems safe with no injuries or damage"*
+
+Instead of overriding the severity or fabricating incident attributes, the middleware:
+
+* Raises a cross-field consistency warning
+* Applies a confidence penalty
+* Preserves traceability to the original description
+
+This ensures that logically inconsistent reports are not passed downstream with unsafe confidence levels.
+
+---
+
+## ⚠️ Rejection Example: Unsafe / Low Confidence Input
+
+The reliability layer enforces a confidence threshold of 0.75. Inputs that are gibberish, missing core fields, or have no valid severity are safely rejected to prevent unsafe or hallucinated incident data.
+
+### Input
+
+```
+asdf qwer zzzz nothing makes sense 12345 ???
+```
+
+### Output
+
+```
+PS C:\Users\manis\OneDrive\Desktop\FireForm-Reliability-Layer> python test_pipeline.py
+
+================ INCIDENT REPORT =================
+Original Input    : asdf qwer zzzz nothing makes sense 12345 ???
+
+⚠️  REPORT REJECTED BY RELIABILITY LAYER
+Reason: Unsafe or Low Confidence Repair
+
+Validation Errors:
+  - {'type': 'string_type', 'loc': ('severity',), 'msg': 'Input should be a valid string', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/string_type'}
+
+Final Confidence  : 0
+==================================================
+```
+
+### Notes
+
+* The input’s confidence score was computed as 0, below the threshold of 0.75.
+* Severity could not be safely inferred from the meaningless text.
+* Demonstrates that the layer prevents unsafe auto-corrections and prioritizes operational safety.
 
 ---
 
@@ -165,10 +302,10 @@ FireForm-Reliability-Layer/
 │   │   └── mock_extractor.py
 │   │
 │   ├── schema/
+│       ├── normalizer.py
 │   │   └── incident_schema.py
 │   │
 │   └── reliability/
-│       ├── normalizer.py
 │       ├── missing.py
 │       ├── validator.py
 │       ├── consistency.py
@@ -195,7 +332,7 @@ The focus is structural recoverability, logical coherence, and operational safet
 
 ## 👨‍💻 Author
 
-Manish Krishna Kandrakota (MANISH-K-07)
-B.Tech Computer Science & Engineering
-IEEE-published researcher & Open-source contributor
-Systems & Reliability Engineering Enthusiast
+- Manish Krishna Kandrakota (MANISH-K-07)
+- B.Tech Computer Science & Engineering
+- IEEE-published researcher & Open-source contributor
+- Systems & Reliability Engineering Enthusiast

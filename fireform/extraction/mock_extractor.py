@@ -4,6 +4,10 @@ import hashlib
 
 
 def extract_incident_data(user_input):
+    """
+    Simulates an LLM extraction of incident data.
+    Deterministic chaos injection to test reliability layer.
+    """
 
     # Deterministic seed based on input
     seed = int(hashlib.md5(user_input.encode()).hexdigest(), 16) % (10**8)
@@ -27,7 +31,8 @@ def extract_incident_data(user_input):
     elif "minor" in text or "small" in text:
         severity = "Minor"
     else:
-        severity = "Medium"
+        # **Do NOT default to Medium for garbage input**
+        severity = None
 
     # -------- Time --------
     if "yesterday" in text:
@@ -51,32 +56,23 @@ def extract_incident_data(user_input):
     }
 
     # ---------- CHAOS INJECTION ----------
-
-    # 30% - remove location completely
     if random.random() < 0.3:
         data.pop("location")
-
-    # 20% - location becomes string
     elif random.random() < 0.2:
         data["location"] = "Near downtown mall"
 
-    # 15% - severity becomes free text
     if random.random() < 0.15:
         data["severity"] = "extremely bad"
 
-    # 20% - remove severity
     if random.random() < 0.2:
         data.pop("severity")
 
-    # 25% - invalid datetime
     if random.random() < 0.25:
         data["incident_time"] = "32nd of Feb"
 
-    # 30% - remove time
     if random.random() < 0.3:
         data.pop("incident_time")
 
-    # 40% - report_time missing (LLM probable behaviour)
     if random.random() < 0.4:
         pass
     else:

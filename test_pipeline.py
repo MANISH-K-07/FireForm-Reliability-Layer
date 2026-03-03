@@ -1,7 +1,7 @@
 from main import reliability_layer
 
 # LLM Feed
-user_input = "Severe fire but no visible damage today"
+user_input = "asdf qwer zzzz nothing makes sense 12345 ???"
 
 # Readable Output (Temporary)
 def pretty_print(text, result):
@@ -10,10 +10,11 @@ def pretty_print(text, result):
     print(f"Original Input    : {text}")
 
     validated = result.get("validated_output")
+    threshold = result.get("confidence")
 
     # Case 1 : RELIABILITY LAYER REJECTED THE INCIDENT
 
-    if validated is None:
+    if validated is None or threshold <= 0.75:
 
         print("\n⚠️  REPORT REJECTED BY RELIABILITY LAYER")
         print("Reason: Unsafe or Low Confidence Repair")
