@@ -1,5 +1,12 @@
 # 🔥 FireForm Reliability Middleware Prototype
 
+# 🔥 FireForm Reliability Middleware Prototype
+
+[![GitHub Repo Size](https://img.shields.io/github/repo-size/MANISH-K-07/FireForm-Reliability-Layer)](https://github.com/MANISH-K-07/FireForm-Reliability-Layer)
+[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
+[![GitHub License](https://img.shields.io/github/license/MANISH-K-07/FireForm-Reliability-Layer)](https://github.com/MANISH-K-07/FireForm-Reliability-Layer/blob/main/LICENSE)
+[![GitHub Pages](https://img.shields.io/github/deployments/MANISH-K-07/FireForm-Reliability-Layer/github-pages)](https://MANISH-K-07.github.io/FireForm-Reliability-Layer/)
+
 A safety-preserving reliability layer for structured emergency incident extraction.
 
 This repository contains a modular middleware prototype designed to sit between a Large Language Model (LLM) extraction system and FireForm’s structured incident schema validator.
